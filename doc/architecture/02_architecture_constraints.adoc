@@ -1,0 +1,7 @@
+[[section-architecture-constraints]]
+== Architecture Constraints
+
+* Uses SSH.NET as backbone
+* Provides NuGet Package
+* Developed under liberal open source license
+

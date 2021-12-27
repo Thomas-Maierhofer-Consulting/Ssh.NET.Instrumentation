@@ -1,0 +1,7 @@
+= Ssh.NET.Instrumentation
+
+Secure Shell Instrumentation Package for SSH.NET
+
+== Architecture Documentation
+
+See link:doc/architecture.adoc[Architecture Documentation]
