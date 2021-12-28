@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -72,7 +73,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
         {
             Client = new SshClient(new ConnectionInfo(SshServerHost, SshServerUser,
                 new PasswordAuthenticationMethod(SshServerUser, SshServerPassword)));
-            Client.Connect();
+
         }
 
         public void Dispose()
@@ -90,12 +91,64 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
         // ICollectionFixture<> interfaces.
     }
 
+    [Collection("IntegrationTests")]
+    [TestCaseOrderer("Ssh.Net.Instrumentation.IntegrationTests.PriorityOrderer",
+        "Ssh.Net.Instrumentation.IntegrationTests")]
+    public class CreateDisposeIntegrationTests : IDisposable
+    {
+        private readonly IntegrationTestFixture fixture;
+
+        public CreateDisposeIntegrationTests(IntegrationTestFixture fixture)
+        {
+            this.fixture = fixture;
+
+        }
+
+
+        [Fact, TestPriority(1)]
+        public void InstrumentationCreateDisposeTest()
+        {
+            fixture.Client.Connect();
+
+            ShellInstrumentation instrumentation;
+            using (instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig()))
+            {
+                instrumentation.IsDisposed.Should().BeFalse();
+                instrumentation.IsReady.Should().BeTrue();
+            }
+
+            instrumentation.IsDisposed.Should().BeTrue();
+        }
+
+        [Fact, TestPriority(1)]
+        public void ClientNotConnectedTest()
+        {
+            Action act = () =>
+            {
+                using var instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig());
+            };
+
+            act.Should().Throw<SshConnectionException>()
+                .WithMessage("Client not connected.");
+
+        }
+
+
+        public void Dispose()
+        {
+            if (fixture.Client.IsConnected)
+            {
+                fixture.Client.Disconnect();
+            }
+        }
+    }
+
 
 
     [Collection("IntegrationTests")]
     [TestCaseOrderer("Ssh.Net.Instrumentation.IntegrationTests.PriorityOrderer",
         "Ssh.Net.Instrumentation.IntegrationTests")]
-    public class IntegrationTests
+    public class CommandExecutionIntegrationTests: IDisposable
     {
 
         private const string TestApplicationDirectory =
@@ -107,9 +160,10 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
 
         private readonly IntegrationTestFixture fixture;
 
-        public IntegrationTests(IntegrationTestFixture fixture)
+        public CommandExecutionIntegrationTests(IntegrationTestFixture fixture)
         {
             this.fixture = fixture;
+            fixture.Client.Connect();
         }
 
 
@@ -141,7 +195,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
                 instrumentation.IsReady.Should().BeTrue();
             }
 
-            instrumentation.Execute($"cd {TestApplicationDirectory}");
+            instrumentation.PromptEnter($"cd {TestApplicationDirectory}");
             instrumentation.WaitForReady();
             var promptInfo = instrumentation.GetCurrentPromptInfo();
 
@@ -165,7 +219,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
                 instrumentation.IsReady.Should().BeTrue();
             }
 
-            instrumentation.Execute($"cd {NotExistingDirectory}");
+            instrumentation.PromptEnter($"cd {NotExistingDirectory}");
             instrumentation.WaitForReady();
             var promptInfo = instrumentation.GetCurrentPromptInfo();
 
@@ -187,26 +241,33 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
                 instrumentation.IsDisposed.Should().BeFalse();
                 instrumentation.IsReady.Should().BeTrue();
 
-                instrumentation.Execute($"cd {TestApplicationDirectory}");
+                instrumentation.PromptEnter($"cd {TestApplicationDirectory}");
                 instrumentation.WaitForReady();
                 var promptInfo = instrumentation.GetCurrentPromptInfo();
                 promptInfo.LastExitCode.Should().Be(0);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }
 
-            instrumentation.Execute($"dotnet Ssh.Net.Instrumentation.ServerSideTestApp.dll");
+            instrumentation.PromptEnter($"dotnet Ssh.Net.Instrumentation.ServerSideTestApp.dll");
             instrumentation.WaitForReady();
 
             using (new AssertionScope())
             {
                 var promptInfo = instrumentation.GetCurrentPromptInfo();
                 instrumentation.IsReady.Should().BeTrue();
-                promptInfo.LastExitCode.Should().Be(0);
+                promptInfo.LastExitCode.Should().Be(42);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }
 
         }
 
+        public void Dispose()
+        {
+            if (fixture.Client.IsConnected)
+            {
+                fixture.Client.Disconnect();
+            }
+        }
     }
 }
 

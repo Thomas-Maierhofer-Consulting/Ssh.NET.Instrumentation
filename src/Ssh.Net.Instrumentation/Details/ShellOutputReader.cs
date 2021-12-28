@@ -7,12 +7,12 @@ using Renci.SshNet.Common;
 
 namespace Ssh.Net.Instrumentation.Details
 {
-    internal sealed class ShellOutputReader
+    internal sealed class ShellOutputReader : IDisposable
     {
         private readonly IShellStream shellStream;
         private readonly ShellInstrumentationConfig config;
         private readonly Action<List<string>, ShellPromptInfo?> onNewShellOutputAction;
-        private readonly AutoResetEvent readDataAvailable = new AutoResetEvent(false);
+        private readonly AutoResetEvent readDataAvailable = new AutoResetEvent(true);
         private readonly Thread readWorkerThread;
         private volatile bool shutdownReadWorkerThread;
 
@@ -29,12 +29,12 @@ namespace Ssh.Net.Instrumentation.Details
             readWorkerThread.Start();
         }
 
-        private void OnDataReceived(object sender, ShellDataEventArgs e)
+        public void OnDataReceived(object sender, ShellDataEventArgs e)
         {
             readDataAvailable.Set();
         }
 
-        private void ReadWorkerFkt()
+        public void ReadWorkerFkt()
         {
             while (true)
             {

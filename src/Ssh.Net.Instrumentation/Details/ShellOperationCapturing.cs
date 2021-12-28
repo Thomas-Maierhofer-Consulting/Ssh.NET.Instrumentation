@@ -16,7 +16,7 @@ namespace Ssh.Net.Instrumentation.Details
         public bool WaitForReady();
         public bool WaitForReady(TimeSpan timeout);
         public bool WaitForReady(int millisecondsTimeout);
-        public void Execute(string commands);
+        public void PromptEnter(string text);
     }
 
 
@@ -108,13 +108,14 @@ namespace Ssh.Net.Instrumentation.Details
         {
             if (!IsDisposed)
             {
+                outputReader?.Dispose();
+
                 if (shellStream != null)
                 {
                     shellStream.ErrorOccurred -= OnErrorOccurred;
                     shellStream.Dispose();
                 }
 
-                outputReader?.Dispose();
                 IsDisposed = true;
             }
         }
@@ -134,14 +135,10 @@ namespace Ssh.Net.Instrumentation.Details
             return isReadyEvent.WaitOne(millisecondsTimeout);
         }
 
-        public void Execute(string commands)
+        public void PromptEnter(string text)
         {
-            Console.WriteLine($"EXECUTE : {commands}");
-
             RevokeReady();
-            shellStream.WriteLine(commands);
-
-
+            shellStream.WriteLine(text);
         }
     }
 }

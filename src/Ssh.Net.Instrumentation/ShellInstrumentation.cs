@@ -35,15 +35,26 @@ namespace Ssh.Net.Instrumentation
 
 
 
-        public void Execute(string commands)
+        public void PromptEnter(string text)
         {
-            shellOperationCapturing.Execute(commands);
+            shellOperationCapturing.PromptEnter(text);
         }
 
         public void WaitForReady()
         {
             shellOperationCapturing.WaitForReady();
         }
+
+        public bool WaitForReady(int milliseconds)
+        {
+            return shellOperationCapturing.WaitForReady(milliseconds);
+        }
+
+        public bool WaitForReady(TimeSpan timeSpan)
+        {
+            return shellOperationCapturing.WaitForReady(timeSpan);
+        }
+
 
         public ShellPromptInfo GetCurrentPromptInfo()
         {
