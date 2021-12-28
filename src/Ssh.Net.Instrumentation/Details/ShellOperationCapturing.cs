@@ -37,14 +37,14 @@ namespace Ssh.Net.Instrumentation.Details
 
 
         private readonly ManualResetEvent isReadyEvent = new ManualResetEvent(false);
-        private readonly ShellStream shellStream;
+        private readonly IShellStream shellStream;
         private readonly ShellOutputReader outputReader;
 
         private ShellPromptInfo currentPromptInfo = new ShellPromptInfo();
 
         public ShellOperationCapturing(IShellStream shellStream, ShellInstrumentationConfig config)
         {
-            if (shellStream == null) throw new ArgumentNullException(nameof(shellStream));
+            this.shellStream = shellStream ?? throw new ArgumentNullException(nameof(shellStream));
             this.config = config ?? throw new ArgumentNullException(nameof(config));
 
             try

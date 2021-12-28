@@ -79,9 +79,10 @@ namespace Ssh.Net.Instrumentation.Details
         {
             if (!IsDisposed)
             {
-                shellStream.DataReceived -= OnDataReceived;
                 shutdownReadWorkerThread = true;
+                readDataAvailable.Set();
                 readWorkerThread.Join();
+                shellStream.DataReceived -= OnDataReceived;
                 IsDisposed = true;
             }
         }
