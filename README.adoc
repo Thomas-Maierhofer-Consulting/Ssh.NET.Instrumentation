@@ -2,6 +2,9 @@
 
 Secure Shell Instrumentation Package for SSH.NET
 
+[link=https://ci.appveyor.com/project/ThomasMaierhofer/ssh-net-instrumentation/branch/main]
+image::https://ci.appveyor.com/api/projects/status/9m5vfq3ph4u3pv71/branch/main?svg=true[main Branch Build Status] 
+
 == Architecture Documentation
 
 See link:doc/architecture.adoc[Architecture Documentation]
