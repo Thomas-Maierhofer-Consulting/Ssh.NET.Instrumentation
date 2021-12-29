@@ -1,0 +1,10 @@
+docker build -t ssh_test_image .
+docker run -d -v $(pwd):/app -p 2222:22 --name ssh_test ssh_test_image
+
+docker stop ssh_test
+docker rm ssh_test
+
+cd /app/src/Ssh.Net.Instrumentation.ServerSideTestApp/bin/Debug/netcoreapp3.1
+dotnet Ssh.Net.Instrumentation.ServerSideTestApp.dll
+
+src/Ssh.Net.Instrumentation.IntegrationTests/bin/Debug/netcoreapp3.1/Ssh.Net.Instrumentation.IntegrationTests.dll

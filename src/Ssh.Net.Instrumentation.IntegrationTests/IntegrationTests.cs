@@ -62,16 +62,15 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
         public SshClient Client { get; private set; }
 
 
-        // Adjust Values to your machine setup - this is a WSL2 Ubuntu on Windows with .NET Core 3.1 installed
-
-
-        private const string SshServerHost = "172.25.139.27";
-        private const string SshServerUser = "ubuntu";
-        private const string SshServerPassword = "ubuntu";
+        // These are the settings / credentials for the locally docker image with the test ssh server
+        private const string SshServerHost = "localhost";
+        private const int SshServerPort = 2222;
+        private const string SshServerUser = "test";
+        private const string SshServerPassword = "test";
 
         public IntegrationTestFixture()
         {
-            Client = new SshClient(new ConnectionInfo(SshServerHost, SshServerUser,
+            Client = new SshClient(new ConnectionInfo(SshServerHost, SshServerPort, SshServerUser,
                 new PasswordAuthenticationMethod(SshServerUser, SshServerPassword)));
 
         }
@@ -152,7 +151,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
     {
 
         private const string TestApplicationDirectory =
-            "/mnt/c/Projects/TMC/Ssh.NET.Instrumentation/src/Ssh.Net.Instrumentation.ServerSideTestApp/bin/Debug/netcoreapp3.1";
+            "/app/src/Ssh.Net.Instrumentation.ServerSideTestApp/bin/Debug/netcoreapp3.1";
 
         private const string NotExistingDirectory = "/Tom/Jerry";
 

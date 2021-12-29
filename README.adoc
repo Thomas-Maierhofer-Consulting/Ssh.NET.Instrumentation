@@ -1,9 +1,44 @@
+:source-highlighter: highlight.js
 = Ssh.NET.Instrumentation
 
 Secure Shell Instrumentation Package for SSH.NET
 
 [link=https://ci.appveyor.com/project/ThomasMaierhofer/ssh-net-instrumentation/branch/main]
 image::https://ci.appveyor.com/api/projects/status/9m5vfq3ph4u3pv71/branch/main?svg=true[main Branch Build Status] 
+
+
+
+== Executing Unit Tests and Integration Tests
+
+=== Dockerfile
+
+The folder test-ssh-server includes a Dockerfile with a SSH server and a dotnet SDK 3.1 installation.
+This can be used to run the integration tests.
+
+[source, docker]
+----    
+include::test-ssh-server/Dockerfile[]
+----
+
+== Executing the Integration Tests with the SSH Test Server
+
+The test server image exposes the SSH port 22 which is mapped to 2222 and the 
+current directory is mapped under /app in the docker container:
+
+[source, bash]
+----
+
+# building and running the docker image
+docker build -t ssh_test_image test-ssh-server
+docker run -d -v "$($pwd):/app" -p 2222:22 --name ssh_test ssh_test_image
+
+# running the unit tests and integration tests
+dotnet test src
+
+# stopping and removing the docker image
+docker stop ssh_test
+docker rm ssh_test
+----
 
 == Architecture Documentation
 
