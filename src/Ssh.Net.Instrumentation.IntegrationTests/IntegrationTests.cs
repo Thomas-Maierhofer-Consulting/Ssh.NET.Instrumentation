@@ -248,6 +248,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
                 instrumentation.PromptEnter($"cd {TestApplicationDirectory}");
                 instrumentation.WaitForReady();
                 var promptInfo = instrumentation.GetCurrentPromptInfo();
+                promptInfo.LastCommandNumber.Should().Be(3);
                 promptInfo.LastExitCode.Should().Be(0);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }
@@ -259,6 +260,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             {
                 var promptInfo = instrumentation.GetCurrentPromptInfo();
                 instrumentation.IsReady.Should().BeTrue();
+                promptInfo.LastCommandNumber.Should().Be(4);
                 promptInfo.LastExitCode.Should().Be(42);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }
