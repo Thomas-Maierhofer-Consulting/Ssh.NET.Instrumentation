@@ -173,10 +173,16 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             using (instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig()))
             {
 
-                using (new AssertionScope("Assert"))
+                using (new AssertionScope())
                 {
                     instrumentation.IsDisposed.Should().BeFalse();
                     instrumentation.IsReady.Should().BeTrue();
+                    var promptInfo = instrumentation.GetCurrentPromptInfo();
+                    promptInfo.LastCommandNumber.Should().Be(2);
+                    promptInfo.LastExitCode.Should().Be(0);
+                    promptInfo.CurrentDirectory.Should().Be("~");
+
+
                 }
             }
 
@@ -188,7 +194,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
         {
             using var instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig());
 
-            using (new AssertionScope("Expect"))
+            using (new AssertionScope())
             {
                 instrumentation.IsDisposed.Should().BeFalse();
                 instrumentation.IsReady.Should().BeTrue();
@@ -198,7 +204,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             instrumentation.WaitForReady();
             var promptInfo = instrumentation.GetCurrentPromptInfo();
 
-            using (new AssertionScope("Assert"))
+            using (new AssertionScope())
             {
                 instrumentation.IsReady.Should().BeTrue();
                 promptInfo.LastExitCode.Should().Be(0);
