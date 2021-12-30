@@ -74,12 +74,9 @@ namespace Ssh.Net.Instrumentation.Details
             }
         }
 
-        private void OnNewShellOutput(List<string> lines, ShellPromptInfo? readyPrompt)
+        private void OnNewShellOutput(string text, ShellPromptInfo? readyPrompt)
         {
-            foreach (var line in lines)
-            {
-                Console.WriteLine(line);
-            }
+            Console.Write(text);
 
             if (readyPrompt != null)
             {

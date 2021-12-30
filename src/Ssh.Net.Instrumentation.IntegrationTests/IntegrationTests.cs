@@ -208,7 +208,6 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
                 promptInfo.LastCommandNumber.Should().Be(3);
                 promptInfo.LastExitCode.Should().Be(0);
             }
-
         }
 
 
