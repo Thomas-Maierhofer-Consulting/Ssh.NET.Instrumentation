@@ -172,17 +172,15 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             ShellInstrumentation instrumentation;
             using (instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig()))
             {
+                var promptInfo = instrumentation.GetCurrentPromptInfo();
 
                 using (new AssertionScope())
                 {
                     instrumentation.IsDisposed.Should().BeFalse();
                     instrumentation.IsReady.Should().BeTrue();
-                    var promptInfo = instrumentation.GetCurrentPromptInfo();
                     promptInfo.LastCommandNumber.Should().Be(2);
                     promptInfo.LastExitCode.Should().Be(0);
                     promptInfo.CurrentDirectory.Should().Be("~");
-
-
                 }
             }
 
@@ -207,6 +205,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             using (new AssertionScope())
             {
                 instrumentation.IsReady.Should().BeTrue();
+                promptInfo.LastCommandNumber.Should().Be(3);
                 promptInfo.LastExitCode.Should().Be(0);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }
