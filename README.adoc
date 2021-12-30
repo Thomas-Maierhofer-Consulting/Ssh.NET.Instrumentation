@@ -22,20 +22,37 @@ include::test-ssh-server/Dockerfile[]
 
 == Executing the Integration Tests with the SSH Test Server
 
-The test server image exposes the SSH port 22 which is mapped to 2222 and the 
-current directory is mapped under /app in the docker container:
+The test server image exposes the SSH port 22 which should be mapped to port 2222 and the 
+current directory should be  mapped under /app in the docker container. 
+
+=== Building and pushing the docker image to docker hub
+There is a prebuilt docker image available "maierhoferconsulting/ssh-server-dotnet31-test".
+These are the build / push commands for this image: 
 
 [source, bash]
 ----
+docker build -t maierhoferconsulting/ssh-server-dotnet31-test test-ssh-server
+docker push maierhoferconsulting/ssh-server-dotnet31-test:latest
+----
 
-# building and running the docker image
-docker build -t ssh_test_image test-ssh-server
-docker run -d -v "$($pwd):/app" -p 2222:22 --name ssh_test ssh_test_image
+=== Running the prebuilt docker image in CI and on local machines
 
-# running the unit tests and integration tests
+[source, bash]
+----
+docker run -d -v "$($pwd):/app" -p 2222:22 --name ssh_test maierhoferconsulting/ssh-server-dotnet31-test:latest
+----
+
+=== Running the unit tests and integration tests
+
+[source, bash]
+----
 dotnet test src
+----
 
-# stopping and removing the docker image
+=== Stopping and removing the docker container
+
+[source, bash]
+----
 docker stop ssh_test
 docker rm ssh_test
 ----
