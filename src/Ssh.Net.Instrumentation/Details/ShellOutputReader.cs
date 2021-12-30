@@ -56,9 +56,7 @@ namespace Ssh.Net.Instrumentation.Details
                     var promptIndex = newOutput.LastIndexOf(Constants.ShellPromptPrefix,StringComparison.Ordinal);
                     if (promptIndex >= 0 && newOutput.EndsWith(Constants.ShellPromptPostfix))
                     {
-                        Console.WriteLine("On Open Prompt");
                         var promptText = newOutput.Substring(promptIndex);
-                        Console.WriteLine(promptText);
 
                         var promptFields = promptText.Split(Constants.FieldSeparator);
 
@@ -67,6 +65,8 @@ namespace Ssh.Net.Instrumentation.Details
                         {
                             Console.WriteLine("Ill formed Prompt");
                         }
+                        Console.WriteLine("On Open Prompt " + promptFields[2]);
+                        Console.WriteLine("PROMPT TEXT: " + promptText);
 
                         openPromptInfo = new ShellPromptInfo(int.Parse(promptFields[2]), int.Parse(promptFields[3]), promptFields[4], outputSinceLastReadyPrompt.ToString());
 

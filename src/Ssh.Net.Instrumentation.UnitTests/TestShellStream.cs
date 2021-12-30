@@ -7,7 +7,7 @@ namespace Ssh.Net.Instrumentation.UnitTests
 {
     public class TestShellStream : IShellStream
     {
-        public static string CorrectPrompt => $"{Constants.ShellNewlineSeparator}{Constants.ShellPromptPrefix}0{Constants.FieldSeparator}0{Constants.FieldSeparator}~{Constants.FieldSeparator}{Constants.ShellPromptPostfix}";
+        public static string CorrectPrompt => $"{Constants.ShellNewlineSeparator}{Constants.ShellPromptPrefix}2{Constants.FieldSeparator}0{Constants.FieldSeparator}~{Constants.FieldSeparator}{Constants.ShellPromptPostfix}";
 
 
         public List<string> WrittenLines { get; private set; } = new List<string>();

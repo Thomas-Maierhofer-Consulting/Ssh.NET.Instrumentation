@@ -49,8 +49,7 @@ namespace Ssh.Net.Instrumentation.UnitTests
             operationsCapturing.PromptEnter(string.Empty);
 
             operationsCapturing.IsReady.Should().BeFalse();
-            operationsCapturing.WaitForReady(500).Should().BeFalse();
-            operationsCapturing.WaitForReady(TimeSpan.FromMilliseconds(500)).Should().BeFalse();
+            operationsCapturing.WaitForReady(500,0).Should().BeFalse();
         }
 
         [Fact]
@@ -61,8 +60,7 @@ namespace Ssh.Net.Instrumentation.UnitTests
 
             shellStream.ProvideReaderInput(new[] { TestShellStream.CorrectPrompt });
 
-            operationsCapturing.WaitForReady(500).Should().BeTrue();
-            operationsCapturing.WaitForReady(TimeSpan.FromMilliseconds(500)).Should().BeTrue();
+            operationsCapturing.WaitForReady(500, 0).Should().BeTrue();
             operationsCapturing.IsReady.Should().BeTrue();
         }
 

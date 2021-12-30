@@ -6,15 +6,18 @@ namespace Ssh.Net.Instrumentation
 {
     public class ShellInstrumentation: IDisposable
     {
+        private readonly ShellInstrumentationConfig config;
         private readonly IShellOperationCapturing shellOperationCapturing; 
 
         internal  ShellInstrumentation(IShellStream shellStream, ShellInstrumentationConfig config)
         {
+            this.config = config;
             shellOperationCapturing = new ShellOperationCapturing(shellStream, config);
         }
 
-        internal ShellInstrumentation(IShellOperationCapturing shellOperationCapturing)
+        internal ShellInstrumentation(IShellOperationCapturing shellOperationCapturing, ShellInstrumentationConfig config)
         {
+            this.config = config;
             this.shellOperationCapturing = shellOperationCapturing;
         }
 
@@ -42,17 +45,19 @@ namespace Ssh.Net.Instrumentation
 
         public void WaitForReady()
         {
-            shellOperationCapturing.WaitForReady();
+            WaitForReady(config.DefaultWaitTime);
         }
 
         public bool WaitForReady(int milliseconds)
         {
-            return shellOperationCapturing.WaitForReady(milliseconds);
+            if (milliseconds < 0) throw new ArgumentException("negative timeout value", nameof(milliseconds));
+
+            return shellOperationCapturing.WaitForReady(milliseconds, 0);
         }
 
         public bool WaitForReady(TimeSpan timeSpan)
         {
-            return shellOperationCapturing.WaitForReady(timeSpan);
+            return WaitForReady((int) timeSpan.TotalMilliseconds);
         }
 
 

@@ -16,11 +16,10 @@ namespace Ssh.Net.Instrumentation.UnitTests
             operationsCapturing = Substitute.For<IShellOperationCapturing>();
             operationsCapturing.IsReady.Returns(true, false);
             operationsCapturing.GetCurrentPromptInfo().Returns(new ShellPromptInfo(1,2,"~",string.Empty));
-            operationsCapturing.WaitForReady().Returns(true);
-            operationsCapturing.WaitForReady(1000).Returns(true);
-            operationsCapturing.WaitForReady(TimeSpan.FromMilliseconds(500)).Returns(true);
+            operationsCapturing.WaitForReady(1000,0).Returns(true);
+            operationsCapturing.WaitForReady(500, 0).Returns(true);
 
-            shellInstrumentation = new ShellInstrumentation(operationsCapturing);
+            shellInstrumentation = new ShellInstrumentation(operationsCapturing, new ShellInstrumentationConfig());
         }
 
         [Fact]
@@ -38,10 +37,8 @@ namespace Ssh.Net.Instrumentation.UnitTests
             shellInstrumentation.WaitForReady(1000).Should().BeTrue();
             shellInstrumentation.WaitForReady(TimeSpan.FromMilliseconds(500)).Should().BeTrue();
 
-   
-            operationsCapturing.Received(1).WaitForReady();
-            operationsCapturing.Received(1).WaitForReady(1000);
-            operationsCapturing.Received(1).WaitForReady(TimeSpan.FromMilliseconds(500));
+ 
+            operationsCapturing.Received(1).WaitForReady(1000,0);
         }
 
         [Fact]
