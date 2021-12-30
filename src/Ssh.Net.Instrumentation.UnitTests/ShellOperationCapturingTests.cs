@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Collections;
 using NSubstitute;
@@ -19,13 +21,26 @@ namespace Ssh.Net.Instrumentation.UnitTests
         public ShellOperationCapturingTests()
         {
             shellStream = new TestShellStream();
-            
-            shellStream.ProvideReaderInput(new [] {TestShellStream.CorrectPrompt});
+
+            var startTask = new TaskFactory().StartNew(() =>
+            {
+                shellStream.ProvideReaderInput(new[] { "Shell Startup Text Line1", "Shell Startup Text Line2" });
+
+                while (shellStream.WrittenLines.Count == 0)
+                {
+                    Thread.Sleep(100);
+                }
+
+                shellStream.ProvideReaderInput(new[] { TestShellStream.CorrectPrompt });
+            }, TaskCreationOptions.LongRunning);
+
             
             operationsCapturing = new ShellOperationCapturing(shellStream, new ShellInstrumentationConfig()
             {
                 ShellPromptReadyWaitTime = TimeSpan.FromMilliseconds(10)
             });
+
+            startTask.Wait();
 
             shellStream.WrittenLines.Count.Should().Be(1);
             shellStream.WrittenLines.Should().Contain(new[]

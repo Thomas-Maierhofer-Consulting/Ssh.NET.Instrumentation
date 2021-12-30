@@ -24,7 +24,9 @@ namespace Ssh.Net.Instrumentation.UnitTests
 
         public event EventHandler<ExceptionEventArgs> ErrorOccurred;
         public event EventHandler<ShellDataEventArgs> DataReceived;
+        
         public bool DataAvailable { get; private set; }
+
         public string Read()
         {
             if (readerQueue.Count <= 1) DataAvailable = false;

@@ -54,8 +54,22 @@ namespace Ssh.Net.Instrumentation.Details
             Console.WriteLine("Setup Operation Capturing");
             try
             {
+                // Process the startup messages to get to the regular prompt
+                do
+                {
+                    var text = this.shellStream.Read();
+                    if (text.Length > 0)
+                    {
+                        OnNewShellOutput(text, null);
+                    }
+
+                    Thread.Sleep(100);
+                } while (this.shellStream.DataAvailable);
+
                 shellStream.ErrorOccurred += OnErrorOccurred;
                 outputReader = new ShellOutputReader(shellStream,this.config, OnNewShellOutput);
+
+
 
                 // Setting up the shell prompt
                 // The shell prompt will be forced to a newline to avoid appending to other command output
@@ -118,7 +132,7 @@ namespace Ssh.Net.Instrumentation.Details
             }
         }
 
-        public bool WaitForReady(int millisecondsTimeout, uint commandNumber = 0)
+        public bool WaitForReady(int millisecondsTimeout, uint commandNumber)
         {
             // Check if the prompt is already ready and on the right command number
             lock (readyUpdateLock)
