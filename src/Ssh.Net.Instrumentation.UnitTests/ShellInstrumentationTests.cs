@@ -15,7 +15,7 @@ namespace Ssh.Net.Instrumentation.UnitTests
         {
             operationsCapturing = Substitute.For<IShellOperationCapturing>();
             operationsCapturing.IsReady.Returns(true, false);
-            operationsCapturing.GetCurrentPromptInfo().Returns(new ShellPromptInfo(1,2,"~"));
+            operationsCapturing.GetCurrentPromptInfo().Returns(new ShellPromptInfo(1,2,"~",string.Empty));
             operationsCapturing.WaitForReady().Returns(true);
             operationsCapturing.WaitForReady(1000).Returns(true);
             operationsCapturing.WaitForReady(TimeSpan.FromMilliseconds(500)).Returns(true);

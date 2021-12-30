@@ -188,6 +188,31 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
         }
 
         [Fact, TestPriority(2)]
+        public void ListApplicationDirectoryTest()
+        {
+            using var instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig());
+
+            using (new AssertionScope())
+            {
+                instrumentation.IsDisposed.Should().BeFalse();
+                instrumentation.IsReady.Should().BeTrue();
+            }
+
+            instrumentation.PromptEnter($"ls /app");
+            instrumentation.WaitForReady();
+            var promptInfo = instrumentation.GetCurrentPromptInfo();
+
+            using (new AssertionScope())
+            {
+                instrumentation.IsReady.Should().BeTrue();
+                promptInfo.LastCommandNumber.Should().Be(3);
+                promptInfo.LastExitCode.Should().Be(0);
+            }
+
+        }
+
+
+        [Fact, TestPriority(2)]
         public void ChangeDirectoryTest()
         {
             using var instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig());

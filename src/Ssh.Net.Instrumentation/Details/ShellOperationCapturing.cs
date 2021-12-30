@@ -39,7 +39,6 @@ namespace Ssh.Net.Instrumentation.Details
         private readonly ManualResetEvent isReadyEvent = new ManualResetEvent(false);
         private readonly IShellStream shellStream;
         private readonly ShellOutputReader outputReader;
-
         private ShellPromptInfo currentPromptInfo = new ShellPromptInfo();
 
         public ShellOperationCapturing(IShellStream shellStream, ShellInstrumentationConfig config)
@@ -80,10 +79,6 @@ namespace Ssh.Net.Instrumentation.Details
             foreach (var line in lines)
             {
                 Console.WriteLine(line);
-                if (line.StartsWith("dotnet"))
-                {
-                    Console.WriteLine("dotnet detected");
-                }
             }
 
             if (readyPrompt != null)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Renci.SshNet;
 using Renci.SshNet.Common;
@@ -15,6 +16,7 @@ namespace Ssh.Net.Instrumentation.Details
         private readonly AutoResetEvent readDataAvailable = new AutoResetEvent(true);
         private readonly Thread readWorkerThread;
         private volatile bool shutdownReadWorkerThread;
+        private StringBuilder currentOutput = new StringBuilder();
 
         public bool IsDisposed { get; private set; }
 
@@ -42,7 +44,7 @@ namespace Ssh.Net.Instrumentation.Details
                 if (shutdownReadWorkerThread) return;
 
                 List<string> newLines = new List<string>();
-                ShellPromptInfo? openPromptInfo = null;
+                ShellPromptInfo openPromptInfo = null;
 
                 while (shellStream.DataAvailable)
                 {
@@ -52,6 +54,7 @@ namespace Ssh.Net.Instrumentation.Details
                     
                     openPromptInfo = null;
                     newLines.AddRange(lines);
+                    currentOutput.Append(newData);
 
                     if (lines[^1].StartsWith(Constants.ShellPromptPrefix))
                     {
@@ -60,7 +63,7 @@ namespace Ssh.Net.Instrumentation.Details
                         // Check if this is an open prompt
                         if (promptFields.Length != 6 || promptFields[^1] != Constants.ShellPromptPostfix) continue;
 
-                        openPromptInfo = new ShellPromptInfo(int.Parse(promptFields[2]), int.Parse(promptFields[3]), promptFields[4]);
+                        openPromptInfo = new ShellPromptInfo(int.Parse(promptFields[2]), int.Parse(promptFields[3]), promptFields[4], currentOutput.ToString());
 
                         // Safe time to be really on the prompt and no additional data is dropping in
                         Thread.Sleep(config.ShellPromptReadyWaitTime);
@@ -69,6 +72,11 @@ namespace Ssh.Net.Instrumentation.Details
 
                 if (newLines.Count > 0)
                 {
+                    if (openPromptInfo != null)
+                    {
+                        currentOutput = new StringBuilder();
+                    }
+
                     onNewShellOutputAction.Invoke(newLines, openPromptInfo);
                 }
 
