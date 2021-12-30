@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Collections;
 using NSubstitute;
@@ -19,13 +21,26 @@ namespace Ssh.Net.Instrumentation.UnitTests
         public ShellOperationCapturingTests()
         {
             shellStream = new TestShellStream();
-            
-            shellStream.ProvideReaderInput(new [] {TestShellStream.CorrectPrompt});
+
+            var startTask = new TaskFactory().StartNew(() =>
+            {
+                shellStream.ProvideReaderInput(new[] { "Shell Startup Text Line1", "Shell Startup Text Line2" });
+
+                while (shellStream.WrittenLines.Count == 0)
+                {
+                    Thread.Sleep(100);
+                }
+
+                shellStream.ProvideReaderInput(new[] { TestShellStream.CorrectPrompt });
+            }, TaskCreationOptions.LongRunning);
+
             
             operationsCapturing = new ShellOperationCapturing(shellStream, new ShellInstrumentationConfig()
             {
                 ShellPromptReadyWaitTime = TimeSpan.FromMilliseconds(10)
             });
+
+            startTask.Wait();
 
             shellStream.WrittenLines.Count.Should().Be(1);
             shellStream.WrittenLines.Should().Contain(new[]
@@ -49,8 +64,7 @@ namespace Ssh.Net.Instrumentation.UnitTests
             operationsCapturing.PromptEnter(string.Empty);
 
             operationsCapturing.IsReady.Should().BeFalse();
-            operationsCapturing.WaitForReady(500).Should().BeFalse();
-            operationsCapturing.WaitForReady(TimeSpan.FromMilliseconds(500)).Should().BeFalse();
+            operationsCapturing.WaitForReady(500,0).Should().BeFalse();
         }
 
         [Fact]
@@ -61,8 +75,7 @@ namespace Ssh.Net.Instrumentation.UnitTests
 
             shellStream.ProvideReaderInput(new[] { TestShellStream.CorrectPrompt });
 
-            operationsCapturing.WaitForReady(500).Should().BeTrue();
-            operationsCapturing.WaitForReady(TimeSpan.FromMilliseconds(500)).Should().BeTrue();
+            operationsCapturing.WaitForReady(500, 0).Should().BeTrue();
             operationsCapturing.IsReady.Should().BeTrue();
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -13,9 +14,7 @@ namespace Ssh.Net.Instrumentation.Details
         public bool IsDisposed { get; }
         public bool IsReady { get; }
         public ShellPromptInfo GetCurrentPromptInfo();
-        public bool WaitForReady();
-        public bool WaitForReady(TimeSpan timeout);
-        public bool WaitForReady(int millisecondsTimeout);
+        public bool WaitForReady(int millisecondsTimeout, uint commandNumber);
         public void PromptEnter(string text);
     }
 
@@ -32,25 +31,45 @@ namespace Ssh.Net.Instrumentation.Details
 
         public ShellPromptInfo GetCurrentPromptInfo()
         {
-            return currentPromptInfo;
+            lock (readyUpdateLock)
+            {
+                return currentPromptInfo;
+            }
         }
 
-
-        private readonly ManualResetEvent isReadyEvent = new ManualResetEvent(false);
         private readonly IShellStream shellStream;
         private readonly ShellOutputReader outputReader;
 
+        private readonly object readyUpdateLock = new object();
+        private readonly ManualResetEvent isReadyEvent = new ManualResetEvent(false);
         private ShellPromptInfo currentPromptInfo = new ShellPromptInfo();
+        private uint readyWaitCommandNumber;
 
         public ShellOperationCapturing(IShellStream shellStream, ShellInstrumentationConfig config)
         {
             this.shellStream = shellStream ?? throw new ArgumentNullException(nameof(shellStream));
             this.config = config ?? throw new ArgumentNullException(nameof(config));
 
+            Console.WriteLine();
+            Console.WriteLine("Setup Operation Capturing");
             try
             {
+                // Process the startup messages to get to the regular prompt
+                do
+                {
+                    var text = this.shellStream.Read();
+                    if (text.Length > 0)
+                    {
+                        OnNewShellOutput(text, null);
+                    }
+
+                    Thread.Sleep(100);
+                } while (this.shellStream.DataAvailable);
+
                 shellStream.ErrorOccurred += OnErrorOccurred;
                 outputReader = new ShellOutputReader(shellStream,this.config, OnNewShellOutput);
+
+
 
                 // Setting up the shell prompt
                 // The shell prompt will be forced to a newline to avoid appending to other command output
@@ -63,7 +82,7 @@ namespace Ssh.Net.Instrumentation.Details
                 var shellSetupText = shellSetup.ToString();
                 shellStream.WriteLine(shellSetupText);
 
-                if (!WaitForReady(5000))
+                if (!WaitForReady(5000, 2))
                 {
                     throw new TimeoutException("Shell not entering ready state");
                 }
@@ -75,21 +94,17 @@ namespace Ssh.Net.Instrumentation.Details
             }
         }
 
-        private void OnNewShellOutput(List<string> lines, ShellPromptInfo? readyPrompt)
+        private void OnNewShellOutput(string text, ShellPromptInfo? readyPrompt)
         {
-            foreach (var line in lines)
-            {
-                Console.WriteLine(line);
-                if (line.StartsWith("dotnet"))
-                {
-                    Console.WriteLine("dotnet detected");
-                }
-            }
+            Console.Write(text);
 
             if (readyPrompt != null)
             {
-                Interlocked.Exchange<ShellPromptInfo>(ref currentPromptInfo, readyPrompt);
-                isReadyEvent.Set();
+                lock (readyUpdateLock)
+                {
+                    currentPromptInfo = readyPrompt;
+                    isReadyEvent.Set();
+                }
             }
         }
 
@@ -110,29 +125,48 @@ namespace Ssh.Net.Instrumentation.Details
             {
                 outputReader?.Dispose();
 
-                if (shellStream != null)
-                {
-                    shellStream.ErrorOccurred -= OnErrorOccurred;
-                    shellStream.Dispose();
-                }
+                shellStream.ErrorOccurred -= OnErrorOccurred;
+                shellStream.Dispose();
 
                 IsDisposed = true;
             }
         }
 
-        public bool WaitForReady()
+        public bool WaitForReady(int millisecondsTimeout, uint commandNumber)
         {
-            return isReadyEvent.WaitOne();
-        }
+            // Check if the prompt is already ready and on the right command number
+            lock (readyUpdateLock)
+            {
+                readyWaitCommandNumber = commandNumber;
+                if (isReadyEvent.WaitOne(0))
+                {
+                    var promptInfo = GetCurrentPromptInfo();
+                    if(promptInfo.LastCommandNumber >= commandNumber) return true;
 
-        public bool WaitForReady(TimeSpan timeout)
-        {
-            return isReadyEvent.WaitOne(timeout);
-        }
+                    isReadyEvent.Reset();
+                }
+            }
 
-        public bool WaitForReady(int millisecondsTimeout)
-        {
-            return isReadyEvent.WaitOne(millisecondsTimeout);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < millisecondsTimeout)
+            {
+                
+                int leftoverMilliseconds = millisecondsTimeout - (int) sw.ElapsedMilliseconds;
+                if (isReadyEvent.WaitOne(leftoverMilliseconds))
+                {
+                    lock (readyUpdateLock)
+                    {
+                        var promptInfo = GetCurrentPromptInfo();
+                        if (promptInfo.LastCommandNumber >= commandNumber) return true;
+
+                        isReadyEvent.Reset();
+                    }
+                }
+
+            }
+
+            return false;
         }
 
         public void PromptEnter(string text)

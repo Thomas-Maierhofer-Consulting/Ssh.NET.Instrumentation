@@ -13,6 +13,6 @@ namespace Ssh.Net.Instrumentation
         public int ShellBufferSize { get; set; } = 4096;
 
         public TimeSpan ShellPromptReadyWaitTime { get; set; } = TimeSpan.FromMilliseconds(200);
-
+        public TimeSpan DefaultWaitTime { get; set; } = TimeSpan.FromSeconds(30);
     }
 }

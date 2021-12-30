@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Ssh.Net.Instrumentation.Details;
 using Xunit;
@@ -12,9 +14,24 @@ namespace Ssh.Net.Instrumentation.UnitTests
         {
             using var shellStream = new TestShellStream();
 
-            shellStream.ProvideReaderInput(new[] { TestShellStream.CorrectPrompt });
+            var startTask = new TaskFactory().StartNew(() =>
+            {
+                shellStream.ProvideReaderInput(new[] { "Shell Startup Text Line1", "Shell Startup Text Line2" });
+
+                while (shellStream.WrittenLines.Count == 0)
+                {
+                    Thread.Sleep(100);
+                }
+
+                shellStream.ProvideReaderInput(new[] { TestShellStream.CorrectPrompt });
+            }, TaskCreationOptions.LongRunning);
+
 
             using var operationsCapturing = new ShellOperationCapturing(shellStream, new ShellInstrumentationConfig());
+            startTask.Wait();
+            shellStream.WrittenLines.Count.Should().Be(1);
+            shellStream.WrittenLines[0].StartsWith("PROMPT_COMMAND=").Should().BeTrue();
+
 
             operationsCapturing.IsReady.Should().BeTrue();
             operationsCapturing.IsDisposed.Should().BeFalse();

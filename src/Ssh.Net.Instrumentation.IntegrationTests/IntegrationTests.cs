@@ -172,11 +172,15 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             ShellInstrumentation instrumentation;
             using (instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig()))
             {
+                var promptInfo = instrumentation.GetCurrentPromptInfo();
 
-                using (new AssertionScope("Assert"))
+                using (new AssertionScope())
                 {
                     instrumentation.IsDisposed.Should().BeFalse();
                     instrumentation.IsReady.Should().BeTrue();
+                    promptInfo.LastCommandNumber.Should().Be(2);
+                    promptInfo.LastExitCode.Should().Be(0);
+                    promptInfo.CurrentDirectory.Should().Be("~");
                 }
             }
 
@@ -184,11 +188,35 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
         }
 
         [Fact, TestPriority(2)]
+        public void ListApplicationDirectoryTest()
+        {
+            using var instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig());
+
+            using (new AssertionScope())
+            {
+                instrumentation.IsDisposed.Should().BeFalse();
+                instrumentation.IsReady.Should().BeTrue();
+            }
+
+            instrumentation.PromptEnter($"ls /app");
+            instrumentation.WaitForReady();
+            var promptInfo = instrumentation.GetCurrentPromptInfo();
+
+            using (new AssertionScope())
+            {
+                instrumentation.IsReady.Should().BeTrue();
+                promptInfo.LastCommandNumber.Should().Be(3);
+                promptInfo.LastExitCode.Should().Be(0);
+            }
+        }
+
+
+        [Fact, TestPriority(2)]
         public void ChangeDirectoryTest()
         {
             using var instrumentation = fixture.Client.CreateShellInstrumentation(new ShellInstrumentationConfig());
 
-            using (new AssertionScope("Expect"))
+            using (new AssertionScope())
             {
                 instrumentation.IsDisposed.Should().BeFalse();
                 instrumentation.IsReady.Should().BeTrue();
@@ -198,9 +226,10 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             instrumentation.WaitForReady();
             var promptInfo = instrumentation.GetCurrentPromptInfo();
 
-            using (new AssertionScope("Assert"))
+            using (new AssertionScope())
             {
                 instrumentation.IsReady.Should().BeTrue();
+                promptInfo.LastCommandNumber.Should().Be(3);
                 promptInfo.LastExitCode.Should().Be(0);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }
@@ -243,6 +272,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
                 instrumentation.PromptEnter($"cd {TestApplicationDirectory}");
                 instrumentation.WaitForReady();
                 var promptInfo = instrumentation.GetCurrentPromptInfo();
+                promptInfo.LastCommandNumber.Should().Be(3);
                 promptInfo.LastExitCode.Should().Be(0);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }
@@ -254,6 +284,7 @@ namespace Ssh.Net.Instrumentation.IntegrationTests
             {
                 var promptInfo = instrumentation.GetCurrentPromptInfo();
                 instrumentation.IsReady.Should().BeTrue();
+                promptInfo.LastCommandNumber.Should().Be(4);
                 promptInfo.LastExitCode.Should().Be(42);
                 promptInfo.CurrentDirectory.Should().Be(TestApplicationDirectory);
             }

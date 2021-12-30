@@ -7,7 +7,7 @@ namespace Ssh.Net.Instrumentation.UnitTests
 {
     public class TestShellStream : IShellStream
     {
-        public static string CorrectPrompt => $"{Constants.ShellNewlineSeparator}{Constants.ShellPromptPrefix}0{Constants.FieldSeparator}0{Constants.FieldSeparator}~{Constants.FieldSeparator}{Constants.ShellPromptPostfix}";
+        public static string CorrectPrompt => $"{Constants.ShellNewlineSeparator}{Constants.ShellPromptPrefix}2{Constants.FieldSeparator}0{Constants.FieldSeparator}~{Constants.FieldSeparator}{Constants.ShellPromptPostfix}";
 
 
         public List<string> WrittenLines { get; private set; } = new List<string>();
@@ -24,7 +24,9 @@ namespace Ssh.Net.Instrumentation.UnitTests
 
         public event EventHandler<ExceptionEventArgs> ErrorOccurred;
         public event EventHandler<ShellDataEventArgs> DataReceived;
+        
         public bool DataAvailable { get; private set; }
+
         public string Read()
         {
             if (readerQueue.Count <= 1) DataAvailable = false;
