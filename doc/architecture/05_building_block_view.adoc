@@ -1,4 +1,7 @@
-[[section-building-block-view]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
 
 
 == Building Block View

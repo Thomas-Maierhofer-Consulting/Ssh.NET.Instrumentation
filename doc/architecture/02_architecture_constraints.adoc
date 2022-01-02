@@ -1,4 +1,8 @@
-[[section-architecture-constraints]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
 == Architecture Constraints
 
 * Uses SSH.NET as backbone

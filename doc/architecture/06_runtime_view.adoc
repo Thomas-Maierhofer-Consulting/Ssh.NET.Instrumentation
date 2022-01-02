@@ -1,4 +1,8 @@
-[[section-runtime-view]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
 == Runtime View
 
 

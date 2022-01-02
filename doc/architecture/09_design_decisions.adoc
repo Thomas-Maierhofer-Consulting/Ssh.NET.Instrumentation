@@ -1,4 +1,9 @@
-[[section-design-decisions]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
+
 == Design Decisions
 
 

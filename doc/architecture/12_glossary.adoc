@@ -1,4 +1,9 @@
-[[section-glossary]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
+
 == Glossary
 
 
