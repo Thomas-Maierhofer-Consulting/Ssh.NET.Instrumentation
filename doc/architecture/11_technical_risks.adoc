@@ -1,4 +1,9 @@
-[[section-technical-risks]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
+
 == Risks and Technical Debts
 
 

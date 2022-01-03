@@ -1,5 +1,7 @@
-[[section-deployment-view]]
-
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
 
 == Deployment View
 

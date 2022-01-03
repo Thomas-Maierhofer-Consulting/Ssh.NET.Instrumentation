@@ -1,4 +1,9 @@
-[[section-system-scope-and-context]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
+
 == System Scope and Context
 
 

@@ -1,5 +1,7 @@
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
 :homepage: http://arc42.org
-
 :keywords: software-architecture, documentation, template, arc42
 
 :numbered!:
@@ -18,3 +20,10 @@ Template Revision: 7.0 EN (based on asciidoc), January 2017
 We acknowledge that this document uses material from the
 arc 42 architecture template, http://www.arc42.de.
 Created by Dr. Peter Hruschka & Dr. Gernot Starke.
+
+(c) Modifications for GitHub and the Ssh.NET.Instrumentation Documentation
+By Thomas  Maierhofer Consulting <Thomas Maierhofer>, hattp://maierhofer.de
+
+Architecture Documentation is Licenced under CC BY-SA 4.0
+
+https://creativecommons.org/licenses/by-sa/4.0/

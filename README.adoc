@@ -17,7 +17,7 @@ This can be used to run the integration tests.
 
 [source, docker]
 ----    
-include::test-ssh-server/Dockerfile[]
+See link:test-ssh-server/Dockerfile[Dockerfile]
 ----
 
 == Executing the Integration Tests with the SSH Test Server
@@ -37,6 +37,13 @@ docker push maierhoferconsulting/ssh-server-dotnet31-test:latest
 
 === Running the prebuilt docker image in CI and on local machines
 
+==== Bash
+[source, bash]
+----
+docker run -d -v "$(pwd):/app" -p 2222:22 --name ssh_test maierhoferconsulting/ssh-server-dotnet31-test:latest
+----
+
+==== Powershell
 [source, bash]
 ----
 docker run -d -v "$($pwd):/app" -p 2222:22 --name ssh_test maierhoferconsulting/ssh-server-dotnet31-test:latest

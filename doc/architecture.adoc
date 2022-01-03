@@ -1,81 +1,133 @@
-// header file for arc42-template,
-// including all help texts
-//
-// ====================================
-
-// toc-title definition MUST follow document title without blank line!
 :toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
 
-//additional style for arc42 help callouts
-ifdef::backend-html5[]
-++++
-<style>
-.arc42help {font-size:small; width: 14px; height: 16px; overflow: hidden; position: absolute; right: 0px; padding: 2px 0px 3px 2px;}
-.arc42help::before {content: "?";}
-.arc42help:hover {width:auto; height: auto; z-index: 100; padding: 10px;}
-.arc42help:hover::before {content: "";}
-@media print {
-	.arc42help {display:hidden;}
-}
-</style>
-++++
-endif::backend-html5[]
+== Ssh.NET.Instrumentation Architecture
 
-// configure EN settings for asciidoc
-include::architecture/config.adoc[]
-
-// numbering from here on
 :numbered:
 
-<<<<
-// 1. Introduction and Goals
-include::architecture/01_introduction_and_goals.adoc[]
+== Introduction and Goals
+Describes the relevant requirements and the driving forces that software architects and development team must consider. These include
 
-<<<<
-// 2. Architecture Constraints
-include::architecture/02_architecture_constraints.adoc[]
+* underlying business goals, essential features and functional requirements for the system
+* quality goals for the architecture
+* relevant stakeholders and their expectations
 
-<<<<
-// 3. System Scope and Context
-include::architecture/03_system_scope_and_context.adoc[]
+See: link:architecture/01_introduction_and_goals.adoc[Introduction and Goals]
 
-<<<<
-// 4. Solution Strategy
-include::architecture/04_solution_strategy.adoc[]
+== Architecture Constraints
 
-<<<<
-// 5. Building Block View
-include::architecture/05_building_block_view.adoc[]
+Any requirement that constrains software architects in their freedom of design and implementation decisions or decision about the development process. These constraints sometimes go beyond individual systems and are valid for whole organizations and companies.
 
-<<<<
-// 6. Runtime View
-include::architecture/06_runtime_view.adoc[]
+See: link:architecture/02_architecture_constraints.adoc[Architecture Constraints]
 
-<<<<
-// 7. Deployment View
-include::architecture/07_deployment_view.adoc[]
+== System Scope and Context
 
-<<<<
-// 8. Concepts
-include::architecture/08_concepts.adoc[]
+System scope and context - as the name suggests - delimits your system (i.e. your scope) from all its communication partners
+(neighboring systems and users, i.e. the context of your system). It thereby specifies the external interfaces.
 
-<<<<
-// 9. Design Decisions
-include::architecture/09_design_decisions.adoc[]
+=> TBD
 
-<<<<
-// 10. Quality Scenarios
-include::architecture/10_quality_scenarios.adoc[]
+// See: link:architecture/03_system_scope_and_context.adoc[System Scope and Context]
 
-<<<<
-// 11. Technical Risks
-include::architecture/11_technical_risks.adoc[]
+== Solution Strategy
 
-<<<<
-// 12. Glossary
-include::architecture/12_glossary.adoc[]
+A short summary and explanation of the fundamental decisions and solution strategies, that shape the system's architecture. These include
 
-// horizontal line
-***
+* technology decisions
+* decisions about the top-level decomposition of the system, e.g. usage of an architectural pattern or design pattern
+* decisions on how to achieve key quality goals
+* relevant organizational decisions, e.g. selecting a development process or delegating certain tasks to third parties.
 
-include::architecture/about-arc42.adoc[]
+=> TBD
+
+// See: link:architecture/04_solution_strategy.adoc[Solution Strategy]
+
+== Building Block View
+
+The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes,
+interfaces, packages, libraries, frameworks, layers, partitions, tiers, functions, macros, operations,
+datas structures, ...) as well as their dependencies (relationships, associations, ...)
+
+=> TBD
+
+// See: link:architecture/05_building_block_view.adoc[Building Block View]
+
+== Runtime View
+
+The runtime view describes concrete behavior and interactions of the system’s building blocks in form of scenarios from the following areas:
+
+* important use cases or features: how do building blocks execute them?
+* interactions at critical external interfaces
+* operation and administration: launch, start-up, stop
+* error and exception scenarios
+
+=> TBD
+
+// See: link:architecture/06_runtime_view.adoc[Runtime View]
+
+== Deployment View
+
+* the technical infrastructure used to execute your system, with infrastructure elements like  environments, computers, processors, channels and net topologies as well as other infrastructure elements 
+
+* the mapping of (software) building blocks to that infrastructure elements.
+
+=> TBD 
+
+// See: link:architecture/07_deployment_view.adoc[Deployment View]
+
+== Concepts
+This section describes overall, principal regulations and solution ideas that are
+relevant in multiple parts (= cross-cutting) of your system.
+Such concepts are often related to multiple building blocks.
+They can include many different topics, such as
+
+* domain models
+* architecture patterns or design patterns
+* rules for using specific technology
+* principal, often technical decisions of overall decisions
+* implementation rules
+
+=> TBD
+
+// See: link:architecture/08_concepts.adoc[Concepts]
+
+== Design Decisions
+
+Important, expensive, large scale or risky architecture decisions including rationals.
+With "decisions" we mean selecting one alternative based on given criteria.
+
+=> TBD
+
+// See: link:architecture/09_design_decisions.adoc[Design Decisions]
+
+== Quality Scenarios
+
+This section contains all quality requirements as quality tree with scenarios. The most important ones have already been described in "Quality Goals"
+
+=> TBD
+
+// See: link:architecture/10_quality_scenarios.adoc[Quality Scenarios]
+
+== Technical Risks
+
+A list of identified technical risks or technical debts, ordered by priority
+
+=> TBD
+
+// See: link:architecture/11_technical_risks.adoc[Technical Risks]
+
+
+== Glossary
+
+The most important domain and technical terms that  stakeholders use when discussing the system.
+
+=> TBD
+
+// See: link:architecture/12_glossary.adoc[Glossary]
+
+== About ARC42
+
+This architecture documentation uses / is based on the ARC42 Template in a modified form for GitHub 
+
+See: link:architecture/about-arc42.adoc[About ARC42]

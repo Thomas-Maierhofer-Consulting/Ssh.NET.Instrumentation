@@ -1,4 +1,8 @@
-[[section-concepts]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
 == Cross-cutting Concepts
 
 

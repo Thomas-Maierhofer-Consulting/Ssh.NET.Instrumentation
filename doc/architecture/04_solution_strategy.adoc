@@ -1,4 +1,9 @@
-[[section-solution-strategy]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
+
 == Solution Strategy
 
 

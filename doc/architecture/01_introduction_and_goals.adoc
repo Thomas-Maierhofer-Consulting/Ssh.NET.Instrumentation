@@ -1,4 +1,8 @@
-[[section-introduction-and-goals]]
+:toc-title: Table of Contents
+:toc:
+:imagesdir: ./images
+:numbered:
+
 == Introduction and Goals
 SSH Instrumentation is a key functionality in system and integration testing on hardware (IoT, Industry 4.0). The .NET Framework has a mature SSH.NET library which supports shells and commands. The commands provide already a instrumentation interface for SSH but with one major drawback: The command is implemented as a SSH_MSG_CHANNEL_REQUEST "exec" (RFC 4254) which is not shell bound. This has some unwanted implications:
 
